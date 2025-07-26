@@ -4,12 +4,14 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
 import { getAuth, provideAuth } from '@angular/fire/auth';
+import { getFirestore, provideFirestore } from '@angular/fire/firestore';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
     provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes), provideFirebaseApp(() => 
+    provideRouter(routes), 
+    provideFirebaseApp(() => 
       initializeApp(
       { 
         projectId: "apartment-a469a", 
@@ -19,6 +21,8 @@ export const appConfig: ApplicationConfig = {
         authDomain: "apartment-a469a.firebaseapp.com", 
         messagingSenderId: "1065107610232", 
         measurementId: "G-9LW3GRDQ7K" 
-      })), provideAuth(() => getAuth())
+      })),
+    provideAuth(() => getAuth()),
+    provideFirestore(() => getFirestore())
   ]
 };

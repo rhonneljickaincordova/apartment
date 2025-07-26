@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "rentpro-app": {
+    "apartment": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -61,10 +61,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "rentpro-app:build:production"
+              "buildTarget": "apartment:build:production"
             },
             "development": {
-              "buildTarget": "rentpro-app:build:development"
+              "buildTarget": "apartment:build:development"
             }
           },
           "defaultConfiguration": "development"

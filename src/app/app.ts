@@ -9,7 +9,7 @@ import { Router, RouterOutlet } from '@angular/router';
   styleUrl: './app.scss'
 })
 export class App implements OnInit {
-  protected readonly title = signal('rentpro-app');
+  protected readonly title = signal('apartment');
   auth: Auth = inject(Auth); // 👈 inject AngularFire auth
   constructor(
     private router: Router

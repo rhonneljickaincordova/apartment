@@ -1,1 +1,163 @@
-<p>rates works!</p>
+<div class="rates-container">
+    <h1 class="page-title">
+        <span class="title-icon">⚙️</span>
+        Room Rate Settings
+    </h1>
+
+    <!-- Room Selector -->
+    <div class="room-selector">
+        <button *ngFor="let room of rooms; let i = index" class="room-btn" [class.active]="selectedRoomId === room.id"
+            (click)="selectRoom(room.id)">
+            Room {{ room.id }}
+        </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Loading room data...</p>
+    </div>
+
+    <!-- Rate Configuration Cards -->
+    <form *ngIf="!loading && rateForm" [formGroup]="rateForm" class="cards-grid">
+        <!-- Monthly Rent Card -->
+        <div class="rate-card">
+            <div class="card-header">
+                <div class="card-icon rent-icon">🏠</div>
+                <div class="card-info">
+                    <h3 class="card-title">Monthly Rent</h3>
+                    <p class="card-subtitle">Fixed monthly rent amount</p>
+                </div>
+            </div>
+            <div class="input-container">
+                <span class="currency-label">₱</span>
+                <input type="number" class="rate-input" formControlName="rent" placeholder="0.00" min="0" step="100">
+            </div>
+            <div class="validation-error" *ngIf="rateForm.get('rent')?.invalid && rateForm.get('rent')?.touched">
+                Please enter a valid rent amount
+            </div>
+        </div>
+
+        <!-- Water Rate Card -->
+        <div class="rate-card">
+            <div class="card-header">
+                <div class="card-icon water-icon">💧</div>
+                <div class="card-info">
+                    <h3 class="card-title">Water Rate</h3>
+                    <p class="card-subtitle">Per person per month</p>
+                </div>
+            </div>
+            <div class="input-container">
+                <span class="currency-label">₱</span>
+                <input type="number" class="rate-input" formControlName="water" placeholder="0.00" min="0" step="10">
+                <span class="multiplier">×</span>
+                <input type="number" class="occupants-input" formControlName="occupants" min="1" max="10">
+                <span class="unit-label">persons</span>
+            </div>
+            <div class="calculation-display">
+                Total Water Cost: ₱{{ calculateWaterTotal() | number:'1.0-0' }} per month
+            </div>
+            <div class="validation-error" *ngIf="rateForm.get('water')?.invalid && rateForm.get('water')?.touched">
+                Please enter a valid water rate
+            </div>
+        </div>
+
+        <!-- WiFi Service Card -->
+        <div class="rate-card">
+            <div class="card-header">
+                <div class="card-icon wifi-icon">📶</div>
+                <div class="card-info">
+                    <h3 class="card-title">WiFi Service</h3>
+                    <p class="card-subtitle">Per room per month</p>
+                </div>
+            </div>
+            <div class="input-container">
+                <span class="currency-label">₱</span>
+                <input type="number" class="rate-input" formControlName="wifi" placeholder="0.00" min="0" step="50">
+            </div>
+            <div class="validation-error" *ngIf="rateForm.get('wifi')?.invalid && rateForm.get('wifi')?.touched">
+                Please enter a valid WiFi rate
+            </div>
+        </div>
+
+        <!-- Electricity Rate Card -->
+        <div class="rate-card">
+            <div class="card-header">
+                <div class="card-icon electric-icon">⚡</div>
+                <div class="card-info">
+                    <h3 class="card-title">Electricity Rate</h3>
+                    <p class="card-subtitle">Per kilowatt hour (kWh)</p>
+                </div>
+            </div>
+            <div class="input-container">
+                <span class="currency-label">₱</span>
+                <input type="number" class="rate-input" formControlName="electric" placeholder="0.00" min="0"
+                    step="0.5">
+                <span class="unit-label">per kWh</span>
+            </div>
+            <div class="info-note">
+                <small>💡 This rate will be used to calculate monthly electricity bills based on meter readings</small>
+            </div>
+            <div class="validation-error"
+                *ngIf="rateForm.get('electric')?.invalid && rateForm.get('electric')?.touched">
+                Please enter a valid electricity rate
+            </div>
+        </div>
+    </form>
+
+    <!-- Summary Card -->
+    <div *ngIf="!loading && rateForm" class="summary-card">
+        <h3 class="summary-title">
+            <span class="summary-icon">📋</span>
+            Rate Summary for Room {{ selectedRoomId }}
+        </h3>
+        <div class="summary-grid">
+            <div class="summary-item">
+                <span class="summary-label">Monthly Rent:</span>
+                <span class="summary-value">₱{{ rateForm.get('rent')?.value | number:'1.0-0' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Water ({{ rateForm.get('occupants')?.value }} person{{
+                    rateForm.get('occupants')?.value > 1 ? 's' : '' }}):</span>
+                <span class="summary-value">₱{{ calculateWaterTotal() | number:'1.0-0' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">WiFi Service:</span>
+                <span class="summary-value">₱{{ rateForm.get('wifi')?.value | number:'1.0-0' }}</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Electricity Rate:</span>
+                <span class="summary-value">₱{{ rateForm.get('electric')?.value | number:'1.2-2' }}/kWh</span>
+            </div>
+        </div>
+        <div class="summary-total">
+            <span class="total-label">Fixed Monthly Total:</span>
+            <span class="total-value">₱{{ calculateFixedTotal() | number:'1.0-0' }}</span>
+            <small class="total-note">*Excluding variable electricity usage</small>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons" *ngIf="!loading">
+        <button type="button" class="btn-secondary" (click)="resetForm()" [disabled]="saving">
+            <span class="btn-icon">🔄</span>
+            Reset
+        </button>
+        <button type="button" class="btn-primary" (click)="saveRates()" [disabled]="rateForm.invalid || saving">
+            <span class="btn-icon">{{ saving ? '⏳' : '💾' }}</span>
+            {{ saving ? 'Saving...' : 'Save Room Rates' }}
+        </button>
+    </div>
+
+    <!-- Success Message -->
+    <div *ngIf="successMessage" class="success-message">
+        <span class="success-icon">✅</span>
+        {{ successMessage }}
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="errorMessage" class="error-message">
+        <span class="error-icon">❌</span>
+        {{ errorMessage }}
+    </div>
+</div>

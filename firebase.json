@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/rentpro-app/browser",
+    "public": "dist/apartment/browser",
     "ignore": [
       "firebase.json",
       "**/.*",
